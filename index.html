@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envio de E-mail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Formulário de Envio de E-mail</h2>
+    <form id="emailForm">
+        <legend>Remetente: cleiussonalves1011@gmail.com</legend>
+        <input type="email" id="to" placeholder="E-mail do Destinatário" required>
+        <input type="text" id="subject" placeholder="Assunto" required>
+        <textarea id="message" placeholder="Mensagem" rows="4" required></textarea>
+        <button type="submit">Enviar E-mail</button>
+    </form>
+
+    <p id="status"></p>
+
+    <script>
+        document.getElementById("emailForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Evita o recarregamento da página
+
+            const to = document.getElementById("to").value;
+            const subject = document.getElementById("subject").value;
+            const text = document.getElementById("message").value;
+
+            const statusElement = document.getElementById("status");
+            statusElement.innerText = "Enviando...";
+
+            try {
+                const response = await fetch("http://localhost:3000/send", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ to, subject, text })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusElement.innerText = "✅ E-mail enviado com sucesso!";
+                } else {
+                    statusElement.innerText = "❌ Erro ao enviar: " + data.error;
+                }
+            } catch (error) {
+                statusElement.innerText = "❌ Falha na conexão com o servidor.";
+            }
+        });
+    </script>
+
+</body>
+</html>
