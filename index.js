@@ -1,39 +1,46 @@
-require('dotenv').config();  // Carrega variáveis de ambiente
-const express = require('express');
-const nodemailer = require('nodemailer');
+import express from 'express';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
 
 const app = express();
-app.use(express.json()); // Permite receber JSON no body
+app.use(express.json());
 
-// Configuração do transporte SMTP
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
+// Para servir arquivos HTML na Vercel
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(__dirname));
+
+// Rota principal para carregar o formulário
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Configurar transporte do Nodemailer
+const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_PORT == 465, // true para SSL, false para TLS
+    secure: process.env.SMTP_PORT == 465,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
-// Rota padrão
-const path = require('path'); // Importa a biblioteca path
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Rota para enviar e-mail via POST
+// Rota para envio de e-mail
 app.post('/send', async (req, res) => {
     const { to, subject, text } = req.body;
 
     if (!to || !subject || !text) {
-        return res.status(400).json({ error: "Todos os campos (to, subject, text) são obrigatórios!" });
+        return res.status(400).json({ error: "Todos os campos são obrigatórios!" });
     }
 
     let mailOptions = {
-        from: `"Meu App" <${process.env.EMAIL_USER}>`, // O remetente precisa ser o e-mail autenticado no SMTP
+        from: `"Meu App" <${process.env.EMAIL_USER}>`,
         to,
         subject,
         text
@@ -47,7 +54,5 @@ app.post('/send', async (req, res) => {
     }
 });
 
-// Inicia o servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000 🚀');
-});
+// Exportar como handler para a Vercel
+export default app;
