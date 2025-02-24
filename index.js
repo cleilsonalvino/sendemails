@@ -1,11 +1,11 @@
-fetch('https://sendemails-two.vercel.app/send-email', {
+fetch('http://localhost:3000/send-email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      to: 'cleilsonalves1011@gmail.com',
-      subject: 'Novo email',
+      to: 'cleiussonalves1011@gmail.com',
+      subject: 'Novo Orçamento2',
       text: 'Segue anexo o orçamento solicitado...'
     })
   })
