@@ -15,17 +15,17 @@ app.use(express.json());
 // Endpoint para enviar e-mails
 app.post('/send-email', async (req, res): Promise<void> => {
   try {
-    const { to, subject, text } = req.body;
+    const { to, subject, html } = req.body;
 
     // Validação dos campos obrigatórios
-    if (!to || !subject || !text) {
+    if (!to || !subject || !html) {
       res.status(400).json({ error: 'Campos obrigatórios faltando: to, subject, text' });
       return; // Retorna para evitar a execução do código abaixo
     }
 
     // Cria uma instância do GmailService e envia o e-mail
     const gmailService = new GmailService();
-    await gmailService.sendEmail(to, subject, text);
+    await gmailService.sendEmail(to, subject, html);
 
     // Resposta de sucesso
     res.status(200).json({ message: 'E-mail enviado com sucesso!' });
